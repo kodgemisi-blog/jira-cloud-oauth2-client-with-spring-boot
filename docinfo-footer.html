@@ -23,7 +23,16 @@
         <img src="images/kodgemisi-logo.png" style="filter: brightness(0) invert(1);width: 200px;">
     </a>
     <div id="footer-text">
-        <a href="{scmurl}">Source code of this blog post</a> <br>
+        <a id="scmUrl" href="{scmurl}">Source code of the app in this post</a> <br>
         <a href="{blogurl}">Kod Gemisi Blog</a>
     </div>
 </div>
+
+<script>
+    {
+        const clonedEl = document.getElementById('scmUrl').cloneNode( true );
+        clonedEl.id = 'scmUrlLeft';
+        clonedEl.text = 'Github link of the app in this post';
+        document.getElementById('toc').appendChild(clonedEl);
+    }
+</script>

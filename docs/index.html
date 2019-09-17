@@ -539,6 +539,16 @@ table.CodeRay td.code>pre{padding:0}
         padding-right: 0.9375em;
     }
 
+    #toc {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #scmUrlLeft{
+        margin-top: auto;
+        text-align: center;
+    }
+
     #footer {
         margin-top: 10vh;
     }
@@ -1551,9 +1561,18 @@ Error: Redirect failed because the supplied callback URL is not whitelisted for 
         <img src="images/kodgemisi-logo.png" style="filter: brightness(0) invert(1);width: 200px;">
     </a>
     <div id="footer-text">
-        <a href="https://github.com/kodgemisi-blog/jira-cloud-oauth2-client-with-spring-boot">Source code of this blog post</a> <br>
+        <a id="scmUrl" href="https://github.com/kodgemisi-blog/jira-cloud-oauth2-client-with-spring-boot">Source code of the app in this post</a> <br>
         <a href="https://blog.kodgemisi.com/">Kod Gemisi Blog</a>
     </div>
 </div>
+
+<script>
+    {
+        const clonedEl = document.getElementById('scmUrl').cloneNode( true );
+        clonedEl.id = 'scmUrlLeft';
+        clonedEl.text = 'Github link of the app in this post';
+        document.getElementById('toc').appendChild(clonedEl);
+    }
+</script>
 </body>
 </html>
