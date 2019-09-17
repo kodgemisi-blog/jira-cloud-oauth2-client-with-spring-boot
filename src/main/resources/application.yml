@@ -1,9 +1,25 @@
 spring:
   profiles:
     active: dev
-  jpa:
-    show-sql: true
+
+security:
+  oauth2:
+    client:
+      clientId: ${CLIENT_ID}
+      clientSecret: ${CLIENT_SECRET}
+      accessTokenUri: https://auth.atlassian.com/oauth/token
+      userAuthorizationUri: https://auth.atlassian.com/authorize?audience=api.atlassian.com
+      scope: 'read:jira-user'
+      grantType: 'authorization_code'
+      preEstablishedRedirectUri: ${CALLBACK_URL}
+      useCurrentUri: false
+
+app:
+  cloudId: ${CLOUD_ID}
+  jiraUrl: https://api.atlassian.com/ex/jira/${app.cloudId}/rest/api/3
 
 logging:
   level:
-    org.hibernate.type: trace # to show SQL value bindings
+    org.springframework.security: info
+    org.springframework.security.oauth2: trace
+    org.springframework.web.client: trace

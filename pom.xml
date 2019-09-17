@@ -2,24 +2,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.4.RELEASE</version>
-		<relativePath/>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.8.RELEASE</version>
+        <relativePath/>
+    </parent>
 	<groupId>com.kodgemisi.blog</groupId>
-    <artifactId>change-this</artifactId> <!--TODO-->
+    <artifactId>jira-cloud-oAuth2-client</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>change-this</name><!--TODO-->
-	<description>change-this</description><!--TODO-->
+	<name>Jira Cloud OAuth2 Client with Spring Boot</name>
+	<description>Jira Cloud OAuth2 Client with Spring Boot</description>
 
     <!--Blog post url-->
-    <url>https://kodgemisi-blog.github.io/change-this/</url><!--TODO-->
+    <url>https://kodgemisi-blog.github.io/jira-cloud-oauth2-client-with-spring-boot/</url>
 
     <scm>
         <!--Github repo url-->
-        <url>https://github.com/kodgemisi-blog/change-this</url><!--TODO-->
+        <url>https://github.com/kodgemisi-blog/jira-cloud-oauth2-client-with-spring-boot</url>
     </scm>
 
     <organization>
@@ -36,26 +36,41 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <better-error-pages-spring-boot-starter.version>0.5.1</better-error-pages-spring-boot-starter.version>
+        <better-error-pages-spring-boot-starter.version>0.5.2</better-error-pages-spring-boot-starter.version>
 
         <!-- https://github.com/asciidoctor/asciidoctor-maven-plugin#add-version-and-build-date-to-the-header -->
-        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-	</properties>
+        <maven.build.timestamp.format>2019-09-17</maven.build.timestamp.format>
+
+        <spring-security-oauth2.version>2.3.6.RELEASE</spring-security-oauth2.version>
+    </properties>
 
 	<dependencies>
-        <!--TODO remove unused dependencies-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <!--
+            This dependency is required for
+            and isn't provided in spring-boot-starter-oauth2-client.
+            see: https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-starters/spring-boot-starter-oauth2-client/pom.xml
+            -->
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>${spring-security-oauth2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -92,7 +107,7 @@
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>1.5.8</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <id>output-html</id>

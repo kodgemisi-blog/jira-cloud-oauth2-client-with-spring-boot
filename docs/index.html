@@ -5,8 +5,8 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.8">
-<meta name="author" content="&lt;Writer Name, don't put new line between this and the title&gt;">
-<title>&lt;Blog post title&gt;</title>
+<meta name="author" content="Destan Sarpkaya">
+<title>Jira Cloud OAuth2 Client with Spring Boot</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -552,120 +552,121 @@ table.CodeRay td.code>pre{padding:0}
     #footer-text a:hover,a:focus {
         text-decoration: underline;
     }
+
+    img {
+        border: 1px solid gainsboro;
+    }
 </style>
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>&lt;Blog post title&gt;</h1>
+<h1>Jira Cloud OAuth2 Client with Spring Boot</h1>
 <div class="details">
-<span id="author" class="author">&lt;Writer Name, don't put new line between this and the title&gt;</span><br>
-<span id="revdate">2019-06-07</span>
+<span id="author" class="author">Destan Sarpkaya</span><br>
+<span id="revdate">2019-09-17</span>
 <br><span id="revremark">Kod Gemisi</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_getting_started">Getting started</a></li>
-<li><a href="#_write_your_blog_post">&lt;Write your blog post&#8230;&#8203;&gt;</a></li>
+<li><a href="#_getting_started">Getting started</a>
+<ul class="sectlevel2">
+<li><a href="#_create_a_jira_cloud_account">Create a Jira Cloud account</a></li>
+<li><a href="#_install_ngrok">Install ngrok</a></li>
+<li><a href="#_create_an_atlassian_application">Create an Atlassian application</a>
+<ul class="sectlevel3">
+<li><a href="#_add_your_callback_url">Add your callback URL</a></li>
+<li><a href="#_add_jira_api">Add Jira API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_creating_the_client_application">Creating the client application</a>
+<ul class="sectlevel2">
+<li><a href="#_validating_our_setup">Validating our setup</a></li>
+<li><a href="#_create_a_spring_boot_project">Create a Spring Boot project</a>
+<ul class="sectlevel3">
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_configuration">Configuration</a></li>
+<li><a href="#_how_will_it_work">How will it work?</a></li>
+<li><a href="#_handling_the_callback">Handling the <code>/callback</code></a></li>
+<li><a href="#_keeping_the_original_url">Keeping the original URL</a></li>
+<li><a href="#_putting_all_together">Putting all together</a></li>
+<li><a href="#_using_the_application">Using the application</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_troubleshooting">Troubleshooting</a>
+<ul class="sectlevel2">
+<li><a href="#_callback_url_is_not_whitelisted">Callback URL is not whitelisted</a></li>
+<li><a href="#_failed_to_complete_tunnel_connection">Failed to complete tunnel connection</a></li>
+</ul>
+</li>
+<li><a href="#_references">References</a>
+<ul class="sectlevel2">
+<li><a href="#_more_readings">More readings</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Please read following instructions before writing a blog post</div>
-<div class="imageblock">
-<div class="content">
-<img src="https://i.ibb.co/kyy4PQN/image.png" alt="image">
-</div>
-<div class="title">Figure 1. Use this repository as a template</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="https://i.ibb.co/r3BtLBc/image.png" alt="image">
-</div>
-<div class="title">Figure 2. Create new repository in <code>kodgemisi-blog</code> Github organization</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Choose a descriptive and meaningful <code>repository name</code>.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>The same name must be used as your <code>package name</code> and <code>maven artifact name</code>.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Change <code>com.kodgemisi.blog.demo</code> package to <code>com.kodgemisi.blog.&lt;yourpackage&gt;</code>.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Make sure your package starts with <code>com.kodgemisi.blog</code>.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Clone the new repo in your local file system and import the repository into your IDE.</p>
-</li>
-<li>
-<p>Edit <code>pom.xml</code> file.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Edit all `TODO`s accordingly.</p>
-</li>
-<li>
-<p>Change all <code>change-this</code> fields.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Don&#8217;t add a configuration file other than <code>application.yml</code> unless it&#8217;s specifically required by your blog post subject.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Use <code>dev</code> profile unless it&#8217;s specifically required otherwise by your blog post subject.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Change everything in form of <code>&lt;some text&gt;</code> with your values.</p>
-</li>
-<li>
-<p>Put all images and videos under images folder. link them as follows: <code>image::images/usage.gif</code></p>
-</li>
-<li>
-<p>You need to run <code>mvn clean compile</code> in order the blog post to be generated. It will be generated to <code>docs/index.html</code> file.</p>
-</li>
-<li>
-<p>Remember that this blog post&#8217;s default license is public domain.</p>
-</li>
-<li>
-<p>Remove this block.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
 <div class="sect1">
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>&lt; <strong>Briefly</strong> explain the goal of this blog post.&gt;</p>
+<p>There are currently 2 ways to consume Jira Cloud APIs:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://developer.atlassian.com/cloud/jira/platform/getting-started/">Connect apps</a></p>
+</li>
+<li>
+<p>Other apps</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>&lt; Put an image or preferably a gif/video to show how the finished work would seem or behave &gt;</p>
+<p>In this tutorial or ultimate guide, we will be implementing a Spring Boot OAuth2 client application for <strong>other apps</strong> category.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+There is a Maven archetype to create boiler plate code for creating a <strong>connect app</strong>:
+<a href="https://bitbucket.org/atlassian/atlassian-connect-spring-boot/src/master/">Atlassian Connect for Spring Boot</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Final result</div>
+<div class="paragraph">
+<p>As the final result we will be calling our application&#8217;s endpoint to call Jira Cloud REST API via Spring Security OAuth2 Client integration.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/homePage.png" alt="homePage">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/oauthAuthorizationPrompt.png" alt="oauthAuthorizationPrompt">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/resultJson.png" alt="resultJson">
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -673,14 +674,855 @@ table.CodeRay td.code>pre{padding:0}
 <h2 id="_getting_started">Getting started</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>&lt; Explain, in details, the steps to prepare the development environment (Database, cache, library configuration etc.) to successfully run the sample code in this repository. &gt;</p>
+<p>Before we start implementing our client application we need to prepare our Atlassian account and development environment. In this section we will do preparation step by step.</p>
+</div>
+<div class="sect2">
+<h3 id="_create_a_jira_cloud_account">Create a Jira Cloud account</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Go to <a href="https://www.atlassian.com/try/cloud/signup?bundle=jira-software" class="bare">https://www.atlassian.com/try/cloud/signup?bundle=jira-software</a> and create an (free trial) account.</p>
+</li>
+<li>
+<p>You can skip every skippable thing.</p>
+</li>
+<li>
+<p>Select Kanban, name your project as <code>Demo</code> and go.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+At the time of this writing, Atlassian is accepting <em>guerrillamail</em> addresses. So you can use an email address like <code>demo-yourname@grr.la</code> and then validate the email address via <a href="https://www.guerrillamail.com" class="bare">https://www.guerrillamail.com</a> .
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_install_ngrok">Install ngrok</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Download and install it from <a href="https://ngrok.com" class="bare">https://ngrok.com</a></p>
+</li>
+<li>
+<p>Then start it as follows: <code>./ngrok http 8080</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>We will be working with the <em>https</em> version of the URL.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/ngrokOutput.png" alt="ngrokOutput">
+</div>
+<div class="title">Figure 1. ngrok output should be very similar to this one.</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Don&#8217;t close or restart it during your work. ngrok domain is changed in every restart.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Don&#8217;t try to CTRL+C the URL in the console output as it will kill the process. Just CTRL+click on it and it will be open in default browser.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_an_atlassian_application">Create an Atlassian application</h3>
+<div class="paragraph">
+<p>Go to <a href="https://developer.atlassian.com/apps/" class="bare">https://developer.atlassian.com/apps/</a> and create a new app.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/createYourFirstAppAtlassian.png" alt="createYourFirstAppAtlassian">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/createApp.png" alt="createApp">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/appDetails.png" alt="appDetails">
+</div>
+</div>
+<div class="paragraph">
+<p>Ensure you have <code>OAuth 2.0 (3LO)</code> (highlighted in above image).</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t see <code>OAuth 2.0 (3LO)</code> then enable it with <a href="https://developer.atlassian.com/cloud/jira/platform/oauth-2-authorization-code-grants-3lo-for-apps/#enabling-oauth-2-0&#8212;&#8203;3lo-">those steps</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="_add_your_callback_url">Add your callback URL</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Use the ngrok URL</p>
+</li>
+<li>
+<p>It should be HTTPS</p>
+</li>
+<li>
+<p>You don&#8217;t have to use <code>/callback</code>. You can change it if you want.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/addCallbackToWhitelist.png" alt="addCallbackToWhitelist">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_add_jira_api">Add Jira API</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Click <code>Add APIs</code> link after saving your callback URL.</p>
+</li>
+<li>
+<p>Add <em>Jira platform REST API</em>.</p>
+</li>
+<li>
+<p>Click <code>configure</code> on <em>Jira platform REST API</em>.</p>
+</li>
+<li>
+<p>Ensure <code>read:jira-user</code> scope is added.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/addJiraApi.png" alt="addJiraApi">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/ensureScopes.png" alt="ensureScopes">
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Talk is cheap show me the code</div>
+<div class="paragraph">
+<p>Now we have prepared our accounts and environment and we are ready to create a Spring Boot application to act as a client to our Jira Cloud account.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_write_your_blog_post">&lt;Write your blog post&#8230;&#8203;&gt;</h2>
+<h2 id="_creating_the_client_application">Creating the client application</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Before creating the application we should check if our environment is actually working.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise we could easily be lost hours trying to solve a bug which is never in the application but in the account configuration.</p>
+</div>
+<div class="sect2">
+<h3 id="_validating_our_setup">Validating our setup</h3>
+<div class="paragraph">
+<p><strong>1)</strong> Replace <code>YOUR_CLIENT_ID</code> and <code>YOUR_NGROK_DOMAIN</code> in following URL and call it from your browser.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Remember that <code>YOUR_CLIENT_ID</code> can be found in <em>app details</em> from <a href="https://developer.atlassian.com/apps">Atlassian Applications</a> page.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>https://auth.atlassian.com/authorize?audience=api.atlassian.com&amp;client_id=YOUR_CLIENT_ID&amp;scope=read:jira-user&amp;redirect_uri=https://YOUR_NGROK_DOMAIN/callback&amp;state=KODGEMISI&amp;response_type=code&amp;prompt=consent</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>2)</strong> It should ask you for authorization as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/oauthAuthorizationPrompt.png" alt="oauthAuthorizationPrompt">
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Troubleshooting</div>
+<div class="paragraph">
+<p>If you see below error then (as the error message says) you need to create a Jira Cloud account. See <a href="#_create_a_jira_cloud_account">Create a Jira Cloud account</a></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/dontHaveJiraSiteError.png" alt="dontHaveJiraSiteError">
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>3)</strong> Accept it and you should see an ngrok error page like below:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/failedTunnelError.png" alt="failedTunnelError">
+</div>
+</div>
+<div class="paragraph">
+<p>Your browser&#8217;s address bar should be something like:</p>
+</div>
+<div class="paragraph">
+<p><code><a href="https://4769d10f.ngrok.io/callback?code=XXXXXXXXXXXXXXXX&amp;state=KODGEMISI" class="bare">https://4769d10f.ngrok.io/callback?code=XXXXXXXXXXXXXXXX&amp;state=KODGEMISI</a></code></p>
+</div>
+<div class="paragraph">
+<p>Note that the state is the same as we provided (<code>KODGEMISI</code>) and the URL is the redirection URL we entered in the Atlassian app&#8217;s OAuth configuration page.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Remember that <code>4769d10f.ngrok.io</code> points to <code>localhost:8080</code> hence, <code><a href="https://4769d10f.ngrok.io/callback" class="bare">https://4769d10f.ngrok.io/callback</a></code> means <code>localhost:8080/callback</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now it&#8217;s clear that we need to create an application which handles <code>/callback</code> URL path.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_a_spring_boot_project">Create a Spring Boot project</h3>
+<div class="paragraph">
+<p>Go to start.spring.io or your IDE&#8217;s create Spring Boot project wizard and select followings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Using latest stable Spring Boot version, Java 11 and Maven</p>
+</li>
+<li>
+<p>Spring Web</p>
+</li>
+<li>
+<p>Thymeleaf</p>
+</li>
+<li>
+<p>OAuth2 Client</p>
+</li>
+<li>
+<p>Lombok</p>
+</li>
+<li>
+<p>Spring Boot DevTools</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_dependencies">Dependencies</h4>
+<div class="paragraph">
+<p>We will also need to add following dependency manually:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.springframework.security.oauth<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>spring-security-oauth2<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>${spring-security-oauth2.version}<span class="tag">&lt;/version&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that only <em>Spring Web</em>, <em>OAuth2 Client</em> and manually added <em>spring-security-oauth2</em> are essential dependencies. Other dependencies are just for developer&#8217;s convenience.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+You need to choose a compatible version of <code>spring-security-oauth2</code> with your Spring Security dependency. Check Spring Security dependency version in <a href="https://mvnrepository.com/artifact/org.springframework.security.oauth/spring-security-oauth2/2.3.6.RELEASE">spring-security-oauth2&#8217;s maven page</a> and ensure it&#8217;s the same with your Spring Security dependency version which is resolved from <code>spring-boot-starter-oauth2-client</code>. If you can&#8217;t find the same version then use the latest version of <code>spring-security-oauth2</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Final pom.xml should be like this</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;project</span> <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://maven.apache.org/POM/4.0.0</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xmlns:xsi</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.w3.org/2001/XMLSchema-instance</span><span class="delimiter">&quot;</span></span> <span class="attribute-name">xsi:schemaLocation</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+    <span class="tag">&lt;modelVersion&gt;</span>4.0.0<span class="tag">&lt;/modelVersion&gt;</span>
+    <span class="tag">&lt;parent&gt;</span>
+        <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+        <span class="tag">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2.1.8.RELEASE<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;relativePath</span> <span class="tag">/&gt;</span>
+    <span class="tag">&lt;/parent&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>com.kodgemisi.blog<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>jira-cloud-oAuth2-client<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;name&gt;</span>Jira Cloud OAuth2 Client with Spring Boot<span class="tag">&lt;/name&gt;</span>
+    <span class="tag">&lt;description&gt;</span>Jira Cloud OAuth2 Client with Spring Boot<span class="tag">&lt;/description&gt;</span>
+    <span class="tag">&lt;properties&gt;</span>
+        <span class="tag">&lt;java.version&gt;</span>11<span class="tag">&lt;/java.version&gt;</span>
+        <span class="tag">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="tag">&lt;/project.build.sourceEncoding&gt;</span>
+        <span class="tag">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="tag">&lt;/project.reporting.outputEncoding&gt;</span>
+        <span class="tag">&lt;maven.compiler.source&gt;</span>11<span class="tag">&lt;/maven.compiler.source&gt;</span>
+        <span class="tag">&lt;maven.compiler.target&gt;</span>11<span class="tag">&lt;/maven.compiler.target&gt;</span>
+        <span class="tag">&lt;spring-security-oauth2.version&gt;</span>2.3.6.RELEASE<span class="tag">&lt;/spring-security-oauth2.version&gt;</span>
+    <span class="tag">&lt;/properties&gt;</span>
+    <span class="tag">&lt;dependencies&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-boot-starter-oauth2-client<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.security.oauth<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-security-oauth2<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;version&gt;</span>${spring-security-oauth2.version}<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-boot-starter-thymeleaf<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.projectlombok<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>lombok<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;optional&gt;</span>true<span class="tag">&lt;/optional&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-boot-devtools<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>com.github.kodgemisi<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>better-error-pages-spring-boot-starter<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;version&gt;</span>${better-error-pages-spring-boot-starter.version}<span class="tag">&lt;/version&gt;</span>
+            <span class="tag">&lt;scope&gt;</span>runtime<span class="tag">&lt;/scope&gt;</span>
+            <span class="tag">&lt;optional&gt;</span>true<span class="tag">&lt;/optional&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;scope&gt;</span>test<span class="tag">&lt;/scope&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+    <span class="tag">&lt;/dependencies&gt;</span>
+    <span class="tag">&lt;build&gt;</span>
+        <span class="tag">&lt;plugins&gt;</span>
+            <span class="tag">&lt;plugin&gt;</span>
+                <span class="tag">&lt;groupId&gt;</span>org.springframework.boot<span class="tag">&lt;/groupId&gt;</span>
+                <span class="tag">&lt;artifactId&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;/plugin&gt;</span>
+        <span class="tag">&lt;/plugins&gt;</span>
+    <span class="tag">&lt;/build&gt;</span>
+<span class="tag">&lt;/project&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_configuration">Configuration</h4>
+<div class="paragraph">
+<p>We will define following values in <code>application.yml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="yml"><span class="key">security</span>:
+  <span class="key">oauth2</span>:
+    <span class="key">client</span>:
+      <span class="key">clientId</span>: <span class="string"><span class="content">${CLIENT_ID}</span></span>
+      <span class="key">clientSecret</span>: <span class="string"><span class="content">${CLIENT_SECRET}</span></span>
+      <span class="key">accessTokenUri</span>: <span class="string"><span class="content">https://auth.atlassian.com/oauth/token</span></span>
+      <span class="key">userAuthorizationUri</span>: <span class="string"><span class="content">https://auth.atlassian.com/authorize?audience=api.atlassian.com</span></span>
+      <span class="key">scope</span>: <span class="string"><span class="content">'read:jira-user'</span></span>
+      <span class="key">grantType</span>: <span class="string"><span class="content">'authorization_code'</span></span>
+      <span class="key">preEstablishedRedirectUri</span>: <span class="string"><span class="content">${CALLBACK_URL}</span></span>
+      <span class="key">useCurrentUri</span>: <span class="string"><span class="content">false</span></span>
 
+<span class="key">app</span>:
+  <span class="key">cloudId</span>: <span class="string"><span class="content">${CLOUD_ID}</span></span>
+  <span class="key">jiraUrl</span>: <span class="string"><span class="content">https://api.atlassian.com/ex/jira/${app.cloudId}/rest/api/3</span></span></code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>CLIENT_ID: find it from app details page on <a href="https://developer.atlassian.com/apps" class="bare">https://developer.atlassian.com/apps</a></p>
+</li>
+<li>
+<p>CLIENT_SECRET: secret value on the same page</p>
+</li>
+<li>
+<p>CALLBACK_URL is like <a href="https://4769d10f.ngrok.io/callback" class="bare">https://4769d10f.ngrok.io/callback</a></p>
+</li>
+<li>
+<p>CLOUD_ID is the id of your Jira Cloud instance. See below section to learn how to obtain it.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+You should define those values as environment variables or pass them as JVM arguments so that client id and secret won&#8217;t end up in your Git repository.
+</td>
+</tr>
+</table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Obtaining your <code>CLOUD_ID</code></div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Go to <a href="https://admin.atlassian.com" class="bare">https://admin.atlassian.com</a></p>
+</li>
+<li>
+<p>Click on your site</p>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/atlassianAdmin.png" alt="atlassianAdmin">
+</div>
+</div>
+<div class="paragraph">
+<p>Look at the address bar: <code><a href="https://admin.atlassian.com/s/1324a887-45db-1bf4-1e99-ef0ff456d421/users" class="bare">https://admin.atlassian.com/s/1324a887-45db-1bf4-1e99-ef0ff456d421/users</a></code>.</p>
+</div>
+<div class="paragraph">
+<p><code>1324a887-45db-1bf4-1e99-ef0ff456d421</code> part is your cloud id.</p>
+</div>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/ideaEnvVars.png" alt="ideaEnvVars">
+</div>
+<div class="title">Figure 2. You can define environment variables in your IDE. This is an example screenshot for IntelliJ IDEA.</div>
+</div>
+<div class="paragraph">
+<p>In configuration we define our beans:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Bean</span>
+<span class="annotation">@ConfigurationProperties</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">security.oauth2.client</span><span class="delimiter">&quot;</span></span>)
+OAuth2ProtectedResourceDetails oauth2RemoteResource() {
+    <span class="keyword">return</span> <span class="keyword">new</span> AuthorizationCodeResourceDetails();
+}
+
+<span class="annotation">@Bean</span>
+OAuth2RestTemplate oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext,
+                                      <span class="annotation">@Value</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">${app.jiraUrl}</span><span class="delimiter">&quot;</span></span>) <span class="predefined-type">String</span> baseUrl) {
+
+    <span class="directive">final</span> OAuth2RestTemplate restTemplate = <span class="keyword">new</span> OAuth2RestTemplate(oauth2RemoteResource(), oauth2ClientContext);
+    restTemplate.setUriTemplateHandler(<span class="keyword">new</span> DefaultUriBuilderFactory(baseUrl));
+    <span class="keyword">return</span> restTemplate;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>OAuth2ProtectedResourceDetails</code> instance is formed using <code>security.oauth2.client</code> values from <code>application.yml</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_how_will_it_work">How will it work?</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>We have configured an <code>OAuth2RestTemplate</code> with our <code>OAuth2ProtectedResourceDetails</code>.</p>
+</li>
+<li>
+<p>We will use this rest template when calling Jira Cloud&#8217;s REST APIs.</p>
+</li>
+<li>
+<p>This rest template automatically checks if there is an access token present (cached).</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If access token <strong>not present</strong> then rest template checks if there are <code>code</code> and <code>state</code> request parameters in request.</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>If <code>code</code> and <code>state</code> is <strong>found</strong> then it uses them to get an access token from <code>accessTokenUri</code></p>
+</li>
+<li>
+<p>If <code>code</code> and <code>state</code> is <strong>NOT found</strong> then it redirects us to Atlassian&#8217;s authorization page (<code>userAuthorizationUri</code>).</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>Recall from <a href="#_validating_our_setup">Validating our setup</a>, Atlassian&#8217;s authorization page redirects user to configured callback url with <code>code</code> and <code>state</code> query parameters.</p>
+</li>
+<li>
+<p>Now we have <code>code</code> and <code>state</code> values at hand and manually make the <code>OAuth2RestTemplate</code> call <code>getAccessToken()</code> now. Once access token is retrieved it will be cached internally by <code>OAuth2RestTemplate</code>.</p>
+</li>
+<li>
+<p>At this point we have an access token however not yet make the actual request to Jira Cloud API. Hence, we need to redirect the user to the original URL. After this redirection the flow will hit <em>if access token is present</em> state.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>If access token <strong>is present</strong> then rest template uses the cached access code and puts it in request header before calling Jira Cloud&#8217;s REST APIs.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>We happily get our response <strong>🥳</strong></p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Further descriptions on implementation details can be found in the sample code.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_handling_the_callback">Handling the <code>/callback</code></h4>
+<div class="paragraph">
+<p>The <code>/callback</code> handler has two main responsibility:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Getting the access token from <code>accessTokenUri</code> using <code>code</code> and <code>state</code> values.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>This will be done via <code>restTemplate.getAccessToken()</code> method call. <code>getAccessToken</code> will find <code>code</code> and <code>state</code> values internally so we don&#8217;t have to pass them.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Redirecting to the original URL after caching the access token.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>We keep the original URL in <code>savedRequest</code> instance. We will see how we create and keep this <code>savedRequest</code> later.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Controller</span>
+<span class="annotation">@RequiredArgsConstructor</span>
+<span class="type">class</span> <span class="class">CallbackControllerController</span> {
+
+        <span class="directive">private</span> <span class="directive">final</span> OAuth2RestTemplate restTemplate;
+
+        <span class="annotation">@GetMapping</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/callback</span><span class="delimiter">&quot;</span></span>)
+        <span class="predefined-type">String</span> callback(HttpSession httpSession) {
+
+                <span class="directive">final</span> SavedRequest savedRequest = (SavedRequest) httpSession.getAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">SPRING_SECURITY_SAVED_REQUEST</span><span class="delimiter">&quot;</span></span>);
+                httpSession.removeAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">SPRING_SECURITY_SAVED_REQUEST</span><span class="delimiter">&quot;</span></span>);
+
+                restTemplate.getAccessToken();
+
+                <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">redirect:</span><span class="delimiter">&quot;</span></span> + savedRequest.getRedirectUrl();
+        }
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_keeping_the_original_url">Keeping the original URL</h4>
+<div class="paragraph">
+<p>As we mentioned in the 2nd responsibility of callback handler, we need to keep the original URL only when we are being redirected to Atlassian&#8217;s authorization page.</p>
+</div>
+<div class="paragraph">
+<p>The best place to implement this is <code>RedirectStrategy</code> of <code>OAuth2ClientContextFilter</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Providing a <code>RedirectStrategy</code> implementation which will save the original URL in session just before redirecting</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">OAuth2RedirectStrategy</span> <span class="directive">extends</span> DefaultRedirectStrategy {
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="type">void</span> sendRedirect(HttpServletRequest request, HttpServletResponse response, <span class="predefined-type">String</span> url) <span class="directive">throws</span> <span class="exception">IOException</span> {
+
+        <span class="directive">final</span> <span class="predefined-type">String</span> currentUri = (<span class="predefined-type">String</span>) request.getAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">currentUri</span><span class="delimiter">&quot;</span></span>);
+        <span class="directive">final</span> HttpSession session = request.getSession(<span class="predefined-constant">false</span>);
+
+        <span class="keyword">if</span> (session != <span class="predefined-constant">null</span>) {
+            session.setAttribute(<span class="string"><span class="delimiter">&quot;</span><span class="content">SPRING_SECURITY_SAVED_REQUEST</span><span class="delimiter">&quot;</span></span>, <span class="keyword">new</span> SimpleSavedRequest(currentUri));
+        }
+
+        <span class="local-variable">super</span>.sendRedirect(request, response, url);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Configuring <code>OAuth2ClientContextFilter</code> to use our <code>RedirectStrategy</code> implementation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Bean</span>
+RedirectStrategy oAuth2RedirectStrategy() {
+    <span class="keyword">return</span> <span class="keyword">new</span> OAuth2RedirectStrategy();
+}
+
+<span class="annotation">@Bean</span>
+OAuth2ClientContextFilter oAuth2ClientContextFilter(OAuth2ClientContextFilter oAuth2ClientContextFilter) {
+    oAuth2ClientContextFilter.setRedirectStrategy(oAuth2RedirectStrategy());
+    <span class="keyword">return</span> oAuth2ClientContextFilter;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After that, whenever a callback is made to our <code>/callback</code> url, we will get the access token and then redirect the user to original request url again. This time the user gets the response because we have an access token now.</p>
+</div>
+<div class="paragraph">
+<p>Subsequent requests to Jira Cloud&#8217;s REST API won&#8217;t be redirected because we will be using the cached access token.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_putting_all_together">Putting all together</h4>
+<div class="paragraph">
+<p>So we need some code to actually consumes the Jira Cloud&#8217;s REST API.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example endpoint for us to consume the JIRA API</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Controller</span>
+<span class="annotation">@RequiredArgsConstructor</span>
+<span class="annotation">@RequestMapping</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/myself</span><span class="delimiter">&quot;</span></span>)
+<span class="type">class</span> <span class="class">MyselfController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> OAuth2RestTemplate restTemplate;
+
+    <span class="annotation">@GetMapping</span>
+    ResponseEntity&lt;<span class="predefined-type">Map</span>&lt;?, ?&gt;&gt; myself(WebRequest request) {
+
+        <span class="directive">final</span> <span class="predefined-type">Map</span>&lt;?, ?&gt; result = restTemplate.getForObject(<span class="string"><span class="delimiter">&quot;</span><span class="content">/myself</span><span class="delimiter">&quot;</span></span>, <span class="predefined-type">Map</span>.class);
+
+        <span class="keyword">return</span> ResponseEntity.ok(result);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that we don&#8217;t have to use the <code>restTemplate</code> in a controller. It&#8217;s just convenient in a demo application this way. But in a real application
+you can use <code>restTemplate</code> in service layer, in a batch job, scheduled job etc.</p>
+</div>
+<div class="paragraph">
+<p>Lastly, to use our client we need to provide a way for the user to be authenticated because Spring Security&#8217;s OAuth2 client implementation requires
+the user be fully authenticated before making access token requests.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Configuration</span>
+<span class="annotation">@EnableWebSecurity</span>
+<span class="type">class</span> <span class="class">WebSecurityConfig</span> <span class="directive">extends</span> WebSecurityConfigurerAdapter {
+
+    <span class="annotation">@Override</span>
+    <span class="directive">protected</span> <span class="type">void</span> configure(HttpSecurity http) <span class="directive">throws</span> <span class="exception">Exception</span> {
+        http
+            .authorizeRequests().anyRequest().fullyAuthenticated()
+            .and()
+            .formLogin().and().logout();
+    }
+
+    <span class="annotation">@Autowired</span>
+    <span class="directive">public</span> <span class="type">void</span> configureGlobal(AuthenticationManagerBuilder auth) <span class="directive">throws</span> <span class="exception">Exception</span> {
+        auth.inMemoryAuthentication().withUser(<span class="string"><span class="delimiter">&quot;</span><span class="content">kodgemisi</span><span class="delimiter">&quot;</span></span>).password(<span class="string"><span class="delimiter">&quot;</span><span class="content">{noop}kodgemisi</span><span class="delimiter">&quot;</span></span>).roles(<span class="string"><span class="delimiter">&quot;</span><span class="content">USER</span><span class="delimiter">&quot;</span></span>);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_the_application">Using the application</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Go to link <code><a href="https://NGROK_HOST_NAME" class="bare">https://NGROK_HOST_NAME</a></code>.</p>
+</li>
+<li>
+<p>Login</p>
+<div class="ulist">
+<ul>
+<li>
+<p>username: kodgemisi</p>
+</li>
+<li>
+<p>password: kodgemisi</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Click the link <em>Show "myself" resource from Atlassian Jira Cloud</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>You will be redirected to Atlassian authorization page, accept the authorization</p>
+</li>
+<li>
+<p>You will be redirected to your callback, hence your application</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Your application makes a request to Jira API behind the scenes and returns you the JSON response.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/resultJson.png" alt="resultJson">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting">Troubleshooting</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_callback_url_is_not_whitelisted">Callback URL is not whitelisted</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/callbackNotRegisteredError.png" alt="callbackNotRegisteredError">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>Something went wrong while executing your request.
+Error: Redirect failed because the supplied callback URL is not whitelisted for this application.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Possible cause:</div>
+<p>ngrok URL may be changed. It changes every time you start ngrok. You should be pro ngrok user to have a static URL.</p>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>Reset your callback URL from <code>App Details</code> page on <code><a href="https://developer.atlassian.com/apps/&lt;yourAppId&gt;/details" class="bare">https://developer.atlassian.com/apps/&lt;yourAppId&gt;/details</a></code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_failed_to_complete_tunnel_connection">Failed to complete tunnel connection</h3>
+<div class="imageblock">
+<div class="content">
+<img src="./images/failedTunnelError.png" alt="failedTunnelError">
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Possible cause:</div>
+<p>Your application isn&#8217;t running or crashed.</p>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>Restart the application :)</p>
+</div>
+<div class="paragraph">
+<div class="title">Possible cause:</div>
+<p>ngrok URL is wrong.</p>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>Update the URL in Atlassian app details page and in your application&#8217;s <code>application.yml</code> file.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://developer.atlassian.com/cloud/jira/platform/oauth-2-authorization-code-grants-3lo-for-apps/">OAuth 2.0 (3LO) for Atlassian cloud apps</a></p>
+</li>
+<li>
+<p><a href="https://aaronparecki.com/oauth-2-simplified/">OAuth 2 Simplified Guide</a></p>
+</li>
+<li>
+<p><a href="https://projects.spring.io/spring-security-oauth/docs/oauth2.html#configuring-client-details">Configuring Client Details (Spring Security OAuth2 Developers Guide)</a></p>
+</li>
+<li>
+<p><a href="https://spring.io/guides/tutorials/spring-boot-oauth2/">Spring Boot and OAuth2</a></p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_more_readings">More readings</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://stackoverflow.com/a/13384100/878361">Why is there 3-legged OAuth2 when 2-legged works so well?</a></p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/13387698/why-is-there-an-authorization-code-flow-in-oauth2-when-implicit-flow-works-s/13389335#13389335">Why is there an “Authorization Code” flow in OAuth2 when “Implicit” flow works so well?</a></p>
+</li>
+<li>
+<p><a href="https://superuser.com/a/59094/104973">Host name vs domain name</a></p>
+</li>
+<li>
+<p><a href="https://developer.atlassian.com/cloud/jira/platform/integrating-with-jira-cloud/">Integrating with Jira Cloud</a></p>
+</li>
+</ol>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -690,8 +1532,8 @@ table.CodeRay td.code>pre{padding:0}
     <div id="disqus_thread"></div>
     <script>
         var disqus_config = function () {
-            this.page.url = "https://kodgemisi-blog.github.io/change-this/";
-            this.page.identifier = "change-this";
+            this.page.url = "https://kodgemisi-blog.github.io/jira-cloud-oauth2-client-with-spring-boot/";
+            this.page.identifier = "jira-cloud-oAuth2-client";
         };
 
         (function() { // DON'T EDIT BELOW THIS LINE
@@ -709,7 +1551,7 @@ table.CodeRay td.code>pre{padding:0}
         <img src="images/kodgemisi-logo.png" style="filter: brightness(0) invert(1);width: 200px;">
     </a>
     <div id="footer-text">
-        <a href="https://github.com/kodgemisi-blog/change-this">Source code of this blog post</a> <br>
+        <a href="https://github.com/kodgemisi-blog/jira-cloud-oauth2-client-with-spring-boot">Source code of this blog post</a> <br>
         <a href="https://blog.kodgemisi.com/">Kod Gemisi Blog</a>
     </div>
 </div>

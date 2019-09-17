@@ -1,47 +1,510 @@
 :toc: left
+:toclevels: 4
 :icons: font
 :nofooter:
 :source-highlighter: coderay
 :docinfo: shared,private
 
-= <Blog post title>
-<Writer Name, don't put new line between this and the title>
-
-
-.Please read following instructions before writing a blog post
-****
-
-.Use this repository as a template
-image::https://i.ibb.co/kyy4PQN/image.png[]
-
-.Create new repository in `kodgemisi-blog` Github organization
-image::https://i.ibb.co/r3BtLBc/image.png[]
-
-* Choose a descriptive and meaningful `repository name`.
-  ** The same name must be used as your `package name` and `maven artifact name`.
-* Change `com.kodgemisi.blog.demo` package to `com.kodgemisi.blog.<yourpackage>`.
-  ** Make sure your package starts with `com.kodgemisi.blog`.
-* Clone the new repo in your local file system and import the repository into your IDE.
-* Edit `pom.xml` file.
-  ** Edit all `TODO`s accordingly.
-  ** Change all `change-this` fields.
-* Don't add a configuration file other than `application.yml` unless it's specifically required by your blog post subject.
-  ** Use `dev` profile unless it's specifically required otherwise by your blog post subject.
-* Change everything in form of `<some text>` with your values.
-* Put all images and videos under images folder. link them as follows: `image::images/usage.gif`
-* You need to run `mvn clean compile` in order the blog post to be generated. It will be generated to `docs/index.html` file.
-* Remember that this blog post's default license is public domain.
-* Remove this block.
-****
+= Jira Cloud OAuth2 Client with Spring Boot
+Destan Sarpkaya
 
 == Introduction
 
-< *Briefly* explain the goal of this blog post.>
+There are currently 2 ways to consume Jira Cloud APIs:
 
-< Put an image or preferably a gif/video to show how the finished work would seem or behave >
+* https://developer.atlassian.com/cloud/jira/platform/getting-started/[Connect apps]
+* Other apps
+
+In this tutorial or ultimate guide, we will be implementing a Spring Boot OAuth2 client application for *other apps* category.
+
+TIP: There is a Maven archetype to create boiler plate code for creating a *connect app*:
+https://bitbucket.org/atlassian/atlassian-connect-spring-boot/src/master/[Atlassian Connect for Spring Boot]
+
+.Final result
+****
+As the final result we will be calling our application's endpoint to call Jira Cloud REST API via Spring Security OAuth2 Client integration.
+
+image::images/homePage.png[]
+
+image::images/oauthAuthorizationPrompt.png[]
+
+image::images/resultJson.png[]
+****
 
 == Getting started
 
-< Explain, in details, the steps to prepare the development environment (Database, cache, library configuration etc.) to successfully run the sample code in this repository. >
+Before we start implementing our client application we need to prepare our Atlassian account and development environment. In this section we will do preparation step by step.
 
-== <Write your blog post...>
+=== Create a Jira Cloud account
+
+. Go to https://www.atlassian.com/try/cloud/signup?bundle=jira-software and create an (free trial) account.
+
+. You can skip every skippable thing.
+
+. Select Kanban, name your project as `Demo` and go.
+
+TIP: At the time of this writing, Atlassian is accepting _guerrillamail_ addresses. So you can use an email address like `demo-yourname@grr.la` and then validate the email address via https://www.guerrillamail.com .
+
+=== Install ngrok
+
+. Download and install it from https://ngrok.com
+
+. Then start it as follows: `./ngrok http 8080`
+
+We will be working with the _https_ version of the URL.
+
+.ngrok output should be very similar to this one.
+image::images/ngrokOutput.png[]
+
+WARNING: Don't close or restart it during your work. ngrok domain is changed in every restart.
+
+TIP: Don't try to CTRL+C the URL in the console output as it will kill the process. Just CTRL+click on it and it will be open in default browser.
+
+=== Create an Atlassian application
+
+Go to https://developer.atlassian.com/apps/ and create a new app.
+
+image::images/createYourFirstAppAtlassian.png[]
+
+image::images/createApp.png[]
+
+image::images/appDetails.png[]
+
+Ensure you have `OAuth 2.0 (3LO)` (highlighted in above image).
+
+If you don't see `OAuth 2.0 (3LO)` then enable it with https://developer.atlassian.com/cloud/jira/platform/oauth-2-authorization-code-grants-3lo-for-apps/#enabling-oauth-2-0--3lo-[those steps].
+
+==== Add your callback URL
+
+* Use the ngrok URL
+* It should be HTTPS
+* You don't have to use `/callback`. You can change it if you want.
+
+image::images/addCallbackToWhitelist.png[]
+
+==== Add Jira API
+
+. Click `Add APIs` link after saving your callback URL.
+. Add _Jira platform REST API_.
+. Click `configure` on _Jira platform REST API_.
+. Ensure `read:jira-user` scope is added.
+
+image::images/addJiraApi.png[]
+
+image::images/ensureScopes.png[]
+
+.Talk is cheap show me the code
+****
+Now we have prepared our accounts and environment and we are ready to create a Spring Boot application to act as a client to our Jira Cloud account.
+****
+
+== Creating the client application
+
+Before creating the application we should check if our environment is actually working.
+
+Otherwise we could easily be lost hours trying to solve a bug which is never in the application but in the account configuration.
+
+=== Validating our setup
+
+*1)* Replace `YOUR_CLIENT_ID` and `YOUR_NGROK_DOMAIN` in following URL and call it from your browser.
+
+TIP: Remember that `YOUR_CLIENT_ID` can be found in _app details_ from https://developer.atlassian.com/apps[Atlassian Applications] page.
+
+```
+https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=YOUR_CLIENT_ID&scope=read:jira-user&redirect_uri=https://YOUR_NGROK_DOMAIN/callback&state=KODGEMISI&response_type=code&prompt=consent
+```
+
+*2)* It should ask you for authorization as follows:
+
+image::images/oauthAuthorizationPrompt.png[]
+
+.Troubleshooting
+****
+If you see below error then (as the error message says) you need to create a Jira Cloud account. See <<_create_a_jira_cloud_account, Create a Jira Cloud account>>
+
+image::images/dontHaveJiraSiteError.png[]
+****
+
+*3)* Accept it and you should see an ngrok error page like below:
+
+image::images/failedTunnelError.png[]
+
+Your browser's address bar should be something like:
+
+`https://4769d10f.ngrok.io/callback?code=XXXXXXXXXXXXXXXX&state=KODGEMISI`
+
+Note that the state is the same as we provided (`KODGEMISI`) and the URL is the redirection URL we entered in the Atlassian app's OAuth configuration page.
+
+TIP: Remember that `4769d10f.ngrok.io` points to `localhost:8080` hence, `https://4769d10f.ngrok.io/callback` means `localhost:8080/callback`.
+
+Now it's clear that we need to create an application which handles `/callback` URL path.
+
+=== Create a Spring Boot project
+
+Go to start.spring.io or your IDE's create Spring Boot project wizard and select followings:
+
+* Using latest stable Spring Boot version, Java 11 and Maven
+* Spring Web
+* Thymeleaf
+* OAuth2 Client
+* Lombok
+* Spring Boot DevTools
+
+==== Dependencies
+
+We will also need to add following dependency manually:
+
+```xml
+<dependency>
+    <groupId>org.springframework.security.oauth</groupId>
+    <artifactId>spring-security-oauth2</artifactId>
+    <version>${spring-security-oauth2.version}</version>
+</dependency>
+```
+
+Note that only _Spring Web_, _OAuth2 Client_ and manually added _spring-security-oauth2_ are essential dependencies. Other dependencies are just for developer's convenience.
+
+IMPORTANT: You need to choose a compatible version of `spring-security-oauth2` with your Spring Security dependency. Check Spring Security dependency version in https://mvnrepository.com/artifact/org.springframework.security.oauth/spring-security-oauth2/2.3.6.RELEASE[spring-security-oauth2's maven page] and ensure it's the same with your Spring Security dependency version which is resolved from `spring-boot-starter-oauth2-client`. If you can't find the same version then use the latest version of `spring-security-oauth2`.
+
+.Final pom.xml should be like this
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.8.RELEASE</version>
+        <relativePath />
+    </parent>
+    <groupId>com.kodgemisi.blog</groupId>
+    <artifactId>jira-cloud-oAuth2-client</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Jira Cloud OAuth2 Client with Spring Boot</name>
+    <description>Jira Cloud OAuth2 Client with Spring Boot</description>
+    <properties>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <spring-security-oauth2.version>2.3.6.RELEASE</spring-security-oauth2.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>${spring-security-oauth2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kodgemisi</groupId>
+            <artifactId>better-error-pages-spring-boot-starter</artifactId>
+            <version>${better-error-pages-spring-boot-starter.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+==== Configuration
+
+We will define following values in `application.yml`:
+
+.application.yml
+```yml
+security:
+  oauth2:
+    client:
+      clientId: ${CLIENT_ID}
+      clientSecret: ${CLIENT_SECRET}
+      accessTokenUri: https://auth.atlassian.com/oauth/token
+      userAuthorizationUri: https://auth.atlassian.com/authorize?audience=api.atlassian.com
+      scope: 'read:jira-user'
+      grantType: 'authorization_code'
+      preEstablishedRedirectUri: ${CALLBACK_URL}
+      useCurrentUri: false
+
+app:
+  cloudId: ${CLOUD_ID}
+  jiraUrl: https://api.atlassian.com/ex/jira/${app.cloudId}/rest/api/3
+```
+
+* CLIENT_ID: find it from app details page on https://developer.atlassian.com/apps
+* CLIENT_SECRET: secret value on the same page
+* CALLBACK_URL is like https://4769d10f.ngrok.io/callback
+* CLOUD_ID is the id of your Jira Cloud instance. See below section to learn how to obtain it.
+
+CAUTION: You should define those values as environment variables or pass them as JVM arguments so that client id and secret won't end up in your Git repository.
+
+.Obtaining your `CLOUD_ID`
+****
+. Go to https://admin.atlassian.com
+. Click on your site
+
+image::images/atlassianAdmin.png[]
+
+Look at the address bar: `https://admin.atlassian.com/s/1324a887-45db-1bf4-1e99-ef0ff456d421/users`.
+
+`1324a887-45db-1bf4-1e99-ef0ff456d421` part is your cloud id.
+****
+
+.You can define environment variables in your IDE. This is an example screenshot for IntelliJ IDEA.
+image::images/ideaEnvVars.png[]
+
+In configuration we define our beans:
+
+```java
+@Bean
+@ConfigurationProperties("security.oauth2.client")
+OAuth2ProtectedResourceDetails oauth2RemoteResource() {
+    return new AuthorizationCodeResourceDetails();
+}
+
+@Bean
+OAuth2RestTemplate oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext,
+                                      @Value("${app.jiraUrl}") String baseUrl) {
+
+    final OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(oauth2RemoteResource(), oauth2ClientContext);
+    restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(baseUrl));
+    return restTemplate;
+}
+```
+
+Note that `OAuth2ProtectedResourceDetails` instance is formed using `security.oauth2.client` values from `application.yml`.
+
+==== How will it work?
+
+. We have configured an `OAuth2RestTemplate` with our `OAuth2ProtectedResourceDetails`.
+. We will use this rest template when calling Jira Cloud's REST APIs.
+. This rest template automatically checks if there is an access token present (cached).
+.. If access token *not present* then rest template checks if there are `code` and `state` request parameters in request.
+... If `code` and `state` is *found* then it uses them to get an access token from `accessTokenUri`
+... If `code` and `state` is *NOT found* then it redirects us to Atlassian's authorization page (`userAuthorizationUri`).
+.... Recall from <<_validating_our_setup, Validating our setup>>, Atlassian's authorization page redirects user to configured callback url with `code` and `state` query parameters.
+.... Now we have `code` and `state` values at hand and manually make the `OAuth2RestTemplate` call `getAccessToken()` now. Once access token is retrieved it will be cached internally by `OAuth2RestTemplate`.
+.... At this point we have an access token however not yet make the actual request to Jira Cloud API. Hence, we need to redirect the user to the original URL. After this redirection the flow will hit _if access token is present_ state.
+.. If access token *is present* then rest template uses the cached access code and puts it in request header before calling Jira Cloud's REST APIs.
+. We happily get our response *🥳*
+
+TIP: Further descriptions on implementation details can be found in the sample code.
+
+==== Handling the `/callback`
+
+The `/callback` handler has two main responsibility:
+
+. Getting the access token from `accessTokenUri` using `code` and `state` values.
+.. This will be done via `restTemplate.getAccessToken()` method call. `getAccessToken` will find `code` and `state` values internally so we don't have to pass them.
+. Redirecting to the original URL after caching the access token.
+.. We keep the original URL in `savedRequest` instance. We will see how we create and keep this `savedRequest` later.
+
+```java
+@Controller
+@RequiredArgsConstructor
+class CallbackControllerController {
+
+	private final OAuth2RestTemplate restTemplate;
+
+	@GetMapping("/callback")
+	String callback(HttpSession httpSession) {
+
+		final SavedRequest savedRequest = (SavedRequest) httpSession.getAttribute("SPRING_SECURITY_SAVED_REQUEST");
+		httpSession.removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
+		restTemplate.getAccessToken();
+
+		return "redirect:" + savedRequest.getRedirectUrl();
+	}
+
+}
+```
+
+==== Keeping the original URL
+
+As we mentioned in the 2nd responsibility of callback handler, we need to keep the original URL only when we are being redirected to Atlassian's authorization page.
+
+The best place to implement this is `RedirectStrategy` of `OAuth2ClientContextFilter`.
+
+.Providing a `RedirectStrategy` implementation which will save the original URL in session just before redirecting
+```java
+class OAuth2RedirectStrategy extends DefaultRedirectStrategy {
+
+    @Override
+    public void sendRedirect(HttpServletRequest request, HttpServletResponse response, String url) throws IOException {
+
+        final String currentUri = (String) request.getAttribute("currentUri");
+        final HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.setAttribute("SPRING_SECURITY_SAVED_REQUEST", new SimpleSavedRequest(currentUri));
+        }
+
+        super.sendRedirect(request, response, url);
+    }
+
+}
+```
+
+.Configuring `OAuth2ClientContextFilter` to use our `RedirectStrategy` implementation
+```java
+@Bean
+RedirectStrategy oAuth2RedirectStrategy() {
+    return new OAuth2RedirectStrategy();
+}
+
+@Bean
+OAuth2ClientContextFilter oAuth2ClientContextFilter(OAuth2ClientContextFilter oAuth2ClientContextFilter) {
+    oAuth2ClientContextFilter.setRedirectStrategy(oAuth2RedirectStrategy());
+    return oAuth2ClientContextFilter;
+}
+```
+
+After that, whenever a callback is made to our `/callback` url, we will get the access token and then redirect the user to original request url again. This time the user gets the response because we have an access token now.
+
+Subsequent requests to Jira Cloud's REST API won't be redirected because we will be using the cached access token.
+
+==== Putting all together
+
+So we need some code to actually consumes the Jira Cloud's REST API.
+
+.Example endpoint for us to consume the JIRA API
+```java
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/myself")
+class MyselfController {
+
+    private final OAuth2RestTemplate restTemplate;
+
+    @GetMapping
+    ResponseEntity<Map<?, ?>> myself(WebRequest request) {
+
+        final Map<?, ?> result = restTemplate.getForObject("/myself", Map.class);
+
+        return ResponseEntity.ok(result);
+    }
+}
+```
+
+Note that we don't have to use the `restTemplate` in a controller. It's just convenient in a demo application this way. But in a real application
+you can use `restTemplate` in service layer, in a batch job, scheduled job etc.
+
+Lastly, to use our client we need to provide a way for the user to be authenticated because Spring Security's OAuth2 client implementation requires
+the user be fully authenticated before making access token requests.
+
+```java
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests().anyRequest().fullyAuthenticated()
+            .and()
+            .formLogin().and().logout();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication().withUser("kodgemisi").password("{noop}kodgemisi").roles("USER");
+    }
+}
+```
+
+==== Using the application
+
+* Go to link `https://NGROK_HOST_NAME`.
+* Login
+** username: kodgemisi
+** password: kodgemisi
+* Click the link _Show "myself" resource from Atlassian Jira Cloud_
+** You will be redirected to Atlassian authorization page, accept the authorization
+** You will be redirected to your callback, hence your application
+* Your application makes a request to Jira API behind the scenes and returns you the JSON response.
+
+image::images/resultJson.png[]
+
+== Troubleshooting
+
+=== Callback URL is not whitelisted
+
+image::images/callbackNotRegisteredError.png[]
+
+```
+Something went wrong while executing your request.
+Error: Redirect failed because the supplied callback URL is not whitelisted for this application.
+```
+
+.Possible cause:
+ngrok URL may be changed. It changes every time you start ngrok. You should be pro ngrok user to have a static URL.
+
+.Solution
+Reset your callback URL from `App Details` page on `https://developer.atlassian.com/apps/<yourAppId>/details`
+
+=== Failed to complete tunnel connection
+
+image::images/failedTunnelError.png[]
+
+.Possible cause:
+Your application isn't running or crashed.
+
+.Solution
+Restart the application :)
+
+.Possible cause:
+ngrok URL is wrong.
+
+.Solution
+Update the URL in Atlassian app details page and in your application's `application.yml` file.
+
+== References
+
+. https://developer.atlassian.com/cloud/jira/platform/oauth-2-authorization-code-grants-3lo-for-apps/[OAuth 2.0 (3LO) for Atlassian cloud apps]
+. https://aaronparecki.com/oauth-2-simplified/[OAuth 2 Simplified Guide]
+. https://projects.spring.io/spring-security-oauth/docs/oauth2.html#configuring-client-details[Configuring Client Details (Spring Security OAuth2 Developers Guide)]
+. https://spring.io/guides/tutorials/spring-boot-oauth2/[Spring Boot and OAuth2]
+
+=== More readings
+
+. https://stackoverflow.com/a/13384100/878361[Why is there 3-legged OAuth2 when 2-legged works so well?]
+
+. https://stackoverflow.com/questions/13387698/why-is-there-an-authorization-code-flow-in-oauth2-when-implicit-flow-works-s/13389335#13389335[Why is there an “Authorization Code” flow in OAuth2 when “Implicit” flow works so well?]
+
+. https://superuser.com/a/59094/104973[Host name vs domain name]
+
+. https://developer.atlassian.com/cloud/jira/platform/integrating-with-jira-cloud/[Integrating with Jira Cloud]

@@ -1,0 +1,103 @@
+Atlassian resources:
+
+* https://developer.atlassian.com/apps
+* https://developer.atlassian.com/cloud/jira/platform/oauth-2-authorization-code-grants-3lo-for-apps/
+
+
+https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=tUJ0581sFvSvLvDTM63qARUEycbI7q2W&scope=read:jira-user&redirect_uri=https://2be91c2e.ngrok.io/atlassian-callback&state=YOUR_USER_BOUND_VALUE&response_type=code&prompt=consent
+
+
+
+curl --request POST \
+  --url 'https://auth.atlassian.com/oauth/token' \
+  --header 'Content-Type: application/json' \
+  --data '{"grant_type": "authorization_code","client_id": "tUJ0581sFvSvLvDTM63qARUEycbI7q2W","client_secret": "B4hJTOukECLVF_PpDpgkaBSWXgsPC7J1SR2rdAM54LvYVv72bRjn6Nvy9i__HnT5","code": "MEySUlSAwRPd0MWs","redirect_uri": "https://2be91c2e.ngrok.io/atlassian-callback"}'
+
+
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16bERNemsxTVRoRlFVRTJRa0ZGT0VGRk9URkJOREJDTVRRek5EZzJSRVpDT1VKRFJrVXdNZyJ9.eyJodHRwczovL2F0bGFzc2lhbi5jb20vb2F1dGhDbGllbnRJZCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2VtYWlsRG9tYWluIjoia29kZ2VtaXNpLmNvbSIsImh0dHBzOi8vYXRsYXNzaWFuLmNvbS9zeXN0ZW1BY2NvdW50SWQiOiI1ZDc0ZWU4YjVhNGQ4MTBkMmM0ZGM2NjMiLCJodHRwczovL2F0bGFzc2lhbi5jb20vc3lzdGVtQWNjb3VudEVtYWlsRG9tYWluIjoiY29ubmVjdC5hdGxhc3NpYW4uY29tIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2ZpcnN0UGFydHkiOmZhbHNlLCJpc3MiOiJodHRwczovL2F0bGFzc2lhbi1hY2NvdW50LXByb2QucHVzMi5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NTU3MDU4OmQwMWZkOWIxLTgyYmQtNGQxYy04NjZiLTZmZWRjNDRkNzdhNCIsImF1ZCI6ImFwaS5hdGxhc3NpYW4uY29tIiwiaWF0IjoxNTY3OTUxMTcyLCJleHAiOjE1Njc5NTQ3NzIsImF6cCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwic2NvcGUiOiJyZWFkOmppcmEtdXNlciJ9.CfZh67u8kSAUihU4fBuO2zB9gtNnHGo8IgNQVOJlVOf1MMc-FGk2qqw0k-GmzL7oWqpmrNd98_AtkUcpKnnddUgFX114HK2k_o97UlE-tzNtSl0I8En9UNUUaJJqesW8Hqv3PMOhYDiNArH8UMcHDzK0tTqYe6Lxr6ggLhG1o8UoRBbm1c2fSQmNvPg2vvcQBfBvlaHjGbhz72E-OnUZMGsW7u-CiZp5klfIqdfMD5mXVExT2D3YcMfiX3DbPD8o8MkcroflznFJtClWs-rzj2k939ie563LmR_7VTh-DcgfCvaRyf9MU9EvIOsBsX87Age2BjGVq_bKj4uxZJySjg
+
+
+curl --request GET \
+  --url https://api.atlassian.com/oauth/token/accessible-resources \
+  --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16bERNemsxTVRoRlFVRTJRa0ZGT0VGRk9URkJOREJDTVRRek5EZzJSRVpDT1VKRFJrVXdNZyJ9.eyJodHRwczovL2F0bGFzc2lhbi5jb20vb2F1dGhDbGllbnRJZCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2VtYWlsRG9tYWluIjoia29kZ2VtaXNpLmNvbSIsImh0dHBzOi8vYXRsYXNzaWFuLmNvbS9zeXN0ZW1BY2NvdW50SWQiOiI1ZDc0ZWU4YjVhNGQ4MTBkMmM0ZGM2NjMiLCJodHRwczovL2F0bGFzc2lhbi5jb20vc3lzdGVtQWNjb3VudEVtYWlsRG9tYWluIjoiY29ubmVjdC5hdGxhc3NpYW4uY29tIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2ZpcnN0UGFydHkiOmZhbHNlLCJpc3MiOiJodHRwczovL2F0bGFzc2lhbi1hY2NvdW50LXByb2QucHVzMi5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NTU3MDU4OmQwMWZkOWIxLTgyYmQtNGQxYy04NjZiLTZmZWRjNDRkNzdhNCIsImF1ZCI6ImFwaS5hdGxhc3NpYW4uY29tIiwiaWF0IjoxNTY3OTUxMTcyLCJleHAiOjE1Njc5NTQ3NzIsImF6cCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwic2NvcGUiOiJyZWFkOmppcmEtdXNlciJ9.CfZh67u8kSAUihU4fBuO2zB9gtNnHGo8IgNQVOJlVOf1MMc-FGk2qqw0k-GmzL7oWqpmrNd98_AtkUcpKnnddUgFX114HK2k_o97UlE-tzNtSl0I8En9UNUUaJJqesW8Hqv3PMOhYDiNArH8UMcHDzK0tTqYe6Lxr6ggLhG1o8UoRBbm1c2fSQmNvPg2vvcQBfBvlaHjGbhz72E-OnUZMGsW7u-CiZp5klfIqdfMD5mXVExT2D3YcMfiX3DbPD8o8MkcroflznFJtClWs-rzj2k939ie563LmR_7VTh-DcgfCvaRyf9MU9EvIOsBsX87Age2BjGVq_bKj4uxZJySjg' \
+  --header 'Accept: application/json'
+
+[{"id":"a733a618-c7c8-453a-b1dc-03f8b545a1cc","url":"https://kodgemisi.atlassian.net","name":"kodgemisi","scopes":["read:jira-user"],"avatarUrl":"https://site-admin-avatar-cdn.prod.public.atl-paas.net/avatars/240/koala.png"}]
+
+
+  https://api.atlassian.com/ex/jira/a733a618-c7c8-453a-b1dc-03f8b545a1cc/rest/api/3/user?accountId=384093%3A32b4d9w0-f6a5-3535-11a3-9c8c88d10192 
+
+
+  curl --request GET \
+  --url https://api.atlassian.com/ex/jira/a733a618-c7c8-453a-b1dc-03f8b545a1cc/rest/api/3/myself \
+  --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16bERNemsxTVRoRlFVRTJRa0ZGT0VGRk9URkJOREJDTVRRek5EZzJSRVpDT1VKRFJrVXdNZyJ9.eyJodHRwczovL2F0bGFzc2lhbi5jb20vb2F1dGhDbGllbnRJZCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2VtYWlsRG9tYWluIjoia29kZ2VtaXNpLmNvbSIsImh0dHBzOi8vYXRsYXNzaWFuLmNvbS9zeXN0ZW1BY2NvdW50SWQiOiI1ZDc0ZWU4YjVhNGQ4MTBkMmM0ZGM2NjMiLCJodHRwczovL2F0bGFzc2lhbi5jb20vc3lzdGVtQWNjb3VudEVtYWlsRG9tYWluIjoiY29ubmVjdC5hdGxhc3NpYW4uY29tIiwiaHR0cHM6Ly9hdGxhc3NpYW4uY29tL2ZpcnN0UGFydHkiOmZhbHNlLCJpc3MiOiJodHRwczovL2F0bGFzc2lhbi1hY2NvdW50LXByb2QucHVzMi5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NTU3MDU4OmQwMWZkOWIxLTgyYmQtNGQxYy04NjZiLTZmZWRjNDRkNzdhNCIsImF1ZCI6ImFwaS5hdGxhc3NpYW4uY29tIiwiaWF0IjoxNTY3OTUxMTcyLCJleHAiOjE1Njc5NTQ3NzIsImF6cCI6InRVSjA1ODFzRnZTdkx2RFRNNjNxQVJVRXljYkk3cTJXIiwic2NvcGUiOiJyZWFkOmppcmEtdXNlciJ9.CfZh67u8kSAUihU4fBuO2zB9gtNnHGo8IgNQVOJlVOf1MMc-FGk2qqw0k-GmzL7oWqpmrNd98_AtkUcpKnnddUgFX114HK2k_o97UlE-tzNtSl0I8En9UNUUaJJqesW8Hqv3PMOhYDiNArH8UMcHDzK0tTqYe6Lxr6ggLhG1o8UoRBbm1c2fSQmNvPg2vvcQBfBvlaHjGbhz72E-OnUZMGsW7u-CiZp5klfIqdfMD5mXVExT2D3YcMfiX3DbPD8o8MkcroflznFJtClWs-rzj2k939ie563LmR_7VTh-DcgfCvaRyf9MU9EvIOsBsX87Age2BjGVq_bKj4uxZJySjg' \
+  --header 'Accept: application/json'
+
+
+  org.springframework.security.oauth2.client.OAuth2RestTemplate#acquireAccessToken
+  org.springframework.security.oauth2.client.token.OAuth2AccessTokenSupport#retrieveToken
+
+
+  org.springframework.security.oauth2.client.OAuth2RestTemplate#acquireAccessToken
+  AccessTokenRequest accessTokenRequest = oauth2Context.getAccessTokenRequest();
+		if (accessTokenRequest == null) {
+
+accessTokenRequest is null if url doesn't have code query param. not that along with the code it should also have state query param.
+
+
+org.springframework.security.web.savedrequest.HttpSessionRequestCache#SAVED_REQUEST
+SPRING_SECURITY_SAVED_REQUEST
+
+SavedRequest handling is shown in following stacktreace
+
+java.lang.ClassCastException: java.lang.String cannot be cast to org.springframework.security.web.savedrequest.SavedRequest
+	org.springframework.security.web.savedrequest.HttpSessionRequestCache.getRequest(HttpSessionRequestCache.java:74)
+	org.springframework.security.web.savedrequest.HttpSessionRequestCache.getMatchingRequest(HttpSessionRequestCache.java:92)
+	org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:60)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:116)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:100)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:74)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:105)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:56)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:215)
+	org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:178)
+	org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:357)
+	org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:270)
+	org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:92)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:93)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+	org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118)
+
+
+
+Remaining "code" and "state" parameters in URL #597
+https://github.com/spring-projects/spring-security-oauth/issues/597
+
+-----
+
+When redirect without doing httpSession.removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
+There was an unexpected error (type=Method Not Allowed, status=405).
+Request method 'null' not supported
+org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'null' not supported
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.handleNoMatch(RequestMappingInfoHandlerMapping.java:200)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lookupHandlerMethod(AbstractHandlerMethodMapping.java:419)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:365)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:65)
+	at org.springframework.web.servlet.handler.AbstractHandlerMapping.getHandler(AbstractHandlerMapping.java:401)
+
+-----
