@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.4.RELEASE</version>
+		<relativePath/>
+	</parent>
+	<groupId>com.kodgemisi.blog</groupId>
+    <artifactId>change-this</artifactId> <!--TODO-->
+	<version>0.0.1-SNAPSHOT</version>
+	<name>change-this</name><!--TODO-->
+	<description>change-this</description><!--TODO-->
+
+    <!--Blog post url-->
+    <url>https://kodgemisi-blog.github.io/change-this/</url><!--TODO-->
+
+    <scm>
+        <!--Github repo url-->
+        <url>https://github.com/kodgemisi-blog/change-this</url><!--TODO-->
+    </scm>
+
+    <organization>
+        <name>Kod Gemisi Blog</name>
+        <url>https://blog.kodgemisi.com/</url>
+    </organization>
+
+	<properties>
+        <java.version>11</java.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <better-error-pages-spring-boot-starter.version>0.5.1</better-error-pages-spring-boot-starter.version>
+
+        <!-- https://github.com/asciidoctor/asciidoctor-maven-plugin#add-version-and-build-date-to-the-header -->
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+	</properties>
+
+	<dependencies>
+        <!--TODO remove unused dependencies-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.kodgemisi</groupId>
+            <artifactId>better-error-pages-spring-boot-starter</artifactId>
+            <version>${better-error-pages-spring-boot-starter.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <version>1.5.8</version>
+                <executions>
+                    <execution>
+                        <id>output-html</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- We add `images/` prefix manually in `readme.adoc` in order to show images on
+                    Github's project page where readme is parsed by Github and {imagesdir} is not available. -->
+                    <imagesDir>./</imagesDir>
+                    <backend>html5</backend>
+                    <sourceDirectory>${basedir}</sourceDirectory>
+                    <sourceDocumentName>README.adoc</sourceDocumentName>
+                    <outputDirectory>${basedir}/docs</outputDirectory>
+                    <outputFile>index.html</outputFile>
+                    <resources>
+                        <resource>
+                            <directory>images</directory>
+                            <targetPath>images</targetPath>
+                        </resource>
+                    </resources>
+
+                    <attributes>
+                        <revdate>${maven.build.timestamp}</revdate>
+                        <revremark>Kod Gemisi</revremark>
+                        <scmurl>${project.scm.url}</scmurl>
+                        <blogurl>${project.organization.url}</blogurl>
+                        <blogpageurl>${project.url}</blogpageurl>
+                        <pageidentifier>${project.artifactId}</pageidentifier>
+                    </attributes>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+</project>

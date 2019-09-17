@@ -1,0 +1,29 @@
+<section id="comments">
+    <h2 id="_view">Comments</h2>
+
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+            this.page.url = "{blogpageurl}";
+            this.page.identifier = "{pageidentifier}";
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://kod-gemisi-github-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+<div id="footer">
+    <a href="https://kodgemisi.com/" target="_blank" style="float: right;">
+        <img src="images/kodgemisi-logo.png" style="filter: brightness(0) invert(1);width: 200px;">
+    </a>
+    <div id="footer-text">
+        <a href="{scmurl}">Source code of this blog post</a> <br>
+        <a href="{blogurl}">Kod Gemisi Blog</a>
+    </div>
+</div>
